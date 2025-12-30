@@ -1,22 +1,15 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
-linha_atual = 2
 
 # JANELA
 janela = tk.Tk()
 janela.title("Controle de Uniformes e EPIs - Nome da Empresa")
-janela.geometry("1080x720")
-janela.resizable(False, False)
+janela.state("zoomed")
+janela.geometry("1080x600")
+janela.resizable(True, True)
 janela.configure(background="#f0f0f0")
 janela.iconbitmap(r"assets\icone_app.ico")
-
-# CENTRALIZA A JANELA
-janela.withdraw()
-x = (janela.winfo_screenwidth() - 1080) // 2
-y = (janela.winfo_screenheight() - 720) // 2
-janela.geometry(f"{1080}x{720}+{x}+{y}")
-janela.deiconify()
 
 # CONFIGURAÇÕES DE ESTILO
 style = ttk.Style()
@@ -69,37 +62,43 @@ painel_notebook.add(notebook)
 # ==============================================================================
 img_estoque = tk.PhotoImage(file=r"assets\icone_estoque.png")
 pagina_estoque = ttk.Frame(notebook)
+pagina_estoque.grid_columnconfigure(0, weight=1)
+pagina_estoque.grid_rowconfigure(2, weight=1)
 notebook.add(pagina_estoque, text="Estoque", image=img_estoque, compound="left")
 
-# 01.1 CABEÇALHO
+# CABEÇALHO
 cabecalho = tk.Frame(pagina_estoque)
 cabecalho.grid(row=0, column=0, sticky='ew')
-
 img_estoque2 = tk.PhotoImage(file=r"assets\icone_estoque2.png")
 tk.Label(cabecalho, image=img_estoque2).grid(row=0, column=0, rowspan=2)
-
 titulo = ttk.Label(cabecalho, text="CONTROLE DE ESTOQUE", font=("Aptos", 20, "bold"), foreground=cor_chave)
 titulo.grid(row=0, column=1, sticky="w", pady=(10, 0))
-
 subtitulo = ttk.Label(cabecalho, text="Nome da Empresa", font=("Aptos", 9), foreground=cor_chave)
 subtitulo.grid(row=1, column=1, sticky="w", pady=(0, 10))
-# 01.2 LABELFRAME
+
+# LABELFRAME FILTROS
 filtros = tk.LabelFrame(pagina_estoque, text="Filtros")
-filtros.grid(row=1, column=0, columnspan=2, pady=(0, 10), padx=(10, 0), sticky="ew")
-# 01.2.1 BARRA DE BUSCA
+filtros.grid(row=1, column=0, columnspan=2, pady=(0, 10), padx=10, sticky="ew")
+# -- BARRA DE BUSCA
 label_produto = ttk.Label(filtros, text="Produto:")
 label_produto.pack(fill="x", side="left", padx=10, pady=(5, 10))
-entry_busca = ttk.Entry(filtros, width=37)
-entry_busca.pack(fill="x", side="left", padx=(0, 10), pady=(5, 10))
-# 01.2.2 COMBOBOX
+entry_busca = ttk.Entry(filtros)
+entry_busca.pack(fill="x", side="left", padx=(0, 10), pady=(5, 10), expand=True)
+# -- COMBOBOX CATEGORIA
+label_categoria = ttk.Label(filtros, text="Categoria:")
+label_categoria.pack(fill="x", side="left", padx=(0, 10), pady=(5, 10))
+combobox_categoria = ttk.Combobox(filtros, values=["UNIF. SUPERIOR", "UNIF. INFERIOR", "EPI - CALÇADO", "EPI - OUTRO"], state="readonly")
+combobox_categoria.pack(fill="x", side="left", padx=(0, 10), pady=(5, 10), expand=True)
+# -- COMBOBOX STATUS
 label_status = ttk.Label(filtros, text="Status:")
 label_status.pack(fill="x", side="left", padx=(0, 10), pady=(5, 10))
-combobox_status = ttk.Combobox(filtros, values=["ESTOQUE EXCESSIVO", "ESTOQUE ADEQUADO", "ESTOQUE MÍNIMO", "ESTOQUE ZERADO"], state="readonly", width=37)
-combobox_status.pack(fill="x", side="left", padx=(0, 10), pady=(5, 10))
-# 01.2.2 BOTÃO BUSCAR
+combobox_status = ttk.Combobox(filtros, values=["ESTOQUE EXCESSIVO", "ESTOQUE ADEQUADO", "ESTOQUE MÍNIMO", "ESTOQUE ZERADO"], state="readonly")
+combobox_status.pack(fill="x", side="left", padx=(0, 10), pady=(5, 10), expand=True)
+# -- BOTÃO BUSCAR
 button_buscar = ttk.Button(filtros, text="Buscar", width=20)
 button_buscar.pack(fill="x", side="right", padx=(0, 10), pady=(5, 10))
-# 01.3 TABELA ESTOQUE
+
+# TABELA ESTOQUE
 tabela_estoque = ttk.Treeview(pagina_estoque, columns=("ID", "Produto", "Disponível", "Pendente", "Status"), show="headings", height=24)
 tabela_estoque.heading("ID", text="ID")
 tabela_estoque.column("ID", width=20, anchor="center")
@@ -111,7 +110,7 @@ tabela_estoque.heading("Pendente", text="Pendente")
 tabela_estoque.column("Pendente", width=100, anchor="center")
 tabela_estoque.heading("Status", text="Status")
 tabela_estoque.column("Status", width=120, anchor="center")
-tabela_estoque.grid(row=2, column=0, columnspan=2, padx=(10, 0), sticky="ew")
+tabela_estoque.grid(row=2, column=0, columnspan=2, padx=10, pady=(0, 10), sticky="nsew")
 
 # ==============================================================================
 # 02. PÁGINA SOLICITAÇÕES DO NOTEBOOK
