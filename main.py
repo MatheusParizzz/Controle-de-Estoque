@@ -52,7 +52,8 @@ painel_barra_lateral = tk.PanedWindow(
     orient=tk.VERTICAL,
     sashwidth=2
 )
-painel_janela.add(painel_barra_lateral, minsize=230)
+painel_janela.add(painel_barra_lateral, minsize=0)
+#painel_janela.paneconfig(painel_barra_lateral, width=260)
 
 painel_notebook = tk.PanedWindow(
     painel_janela,
@@ -141,7 +142,7 @@ subpagina_transacoes = ttk.Frame(notebook_pagina_estoque)
 notebook_pagina_estoque.add(subpagina_transacoes, text="Transações") # ADICIONO A SUBPÁGINA TRANSAÇÕES AO NOTEBOOK PÁGINA ESTOQUE
 
 # BOTÃO LANÇAR TRANSAÇÃO 
-button_lancar_transacao = ttk.Button(subpagina_transacoes, text="Lançar", width=25, command=lambda:abrir_janela_lancar_transacao())
+button_lancar_transacao = ttk.Button(subpagina_transacoes, text="Lançar Transação", width=25, command=lambda:abrir_janela_lancar_transacao())
 button_lancar_transacao.grid(row=0, column=0, pady=(10, 0), padx=10, sticky="e")
 # BOTÃO EXPORTAR
 button_relatorio = ttk.Button(subpagina_transacoes, text="Exportar", width=25)
@@ -153,33 +154,51 @@ button_relatorio.grid(row=0, column=1, pady=(10, 0), padx=(0, 10), sticky="e")
 img_solicitacoes = tk.PhotoImage(file=r"assets\icone_solicitacoes.png")
 pagina_solicitacoes = ttk.Frame(notebook)
 pagina_solicitacoes.grid_columnconfigure(0, weight=1)
-pagina_solicitacoes.grid_rowconfigure(4, weight=1)
+pagina_solicitacoes.grid_rowconfigure(2, weight=1)
 notebook.add(pagina_solicitacoes, text="Solicitações", image=img_solicitacoes, compound="left")
 
 # CABEÇALHO
 cabecalho = tk.Frame(pagina_solicitacoes)
 cabecalho.grid(row=0, column=0, sticky='ew')
-cabecalho.columnconfigure(1, weight=1)
-
+# -- TÍTULO
 titulo = ttk.Label(cabecalho, text="Controle de Solicitações", font=("Aptos", 26, "bold"), foreground=cor_chave)
 titulo.grid(row=0, column=0, sticky="w", pady=(10, 0), padx=(10, 0))
-
+# -- SUBTÍTULO
 subtitulo = ttk.Label(cabecalho, text=nome_da_empresa, font=("Aptos", 9), foreground=cor_chave)
 subtitulo.grid(row=1, column=0, sticky="w", pady=(0, 10), padx=(10, 0))
 
+# SUBNOTEBOOK DENTRO DA PÁGINA SOLICITAÇÕES
+notebook_pagina_solicitacoes = ttk.Notebook(pagina_solicitacoes, style="SubNotebook.TNotebook") # CRIO UM NOVO NOTEBOOK DENTRO DA PÁGINA SOLICITAÇÕES
+notebook_pagina_solicitacoes.grid(row=2, column=0, columnspan=2, sticky="nsew", pady=(0, 5), padx=5)
+
+# -- 02.1 SUBPÁGINA RELATÓRIO =====================================================
+subpagina_relatorio = ttk.Frame(notebook_pagina_solicitacoes)
+subpagina_relatorio.grid_columnconfigure(0, weight=1)
+subpagina_relatorio.grid_rowconfigure(2, weight=1)
+notebook_pagina_solicitacoes.add(subpagina_relatorio, text="Relatório") # ADICIONO A SUBPÁGINA RELATÓRIO AO NOTEBOOK PÁGINA SOLICITAÇÕES
+
 # FRAME DOS BOTÕES
-frame_botoes = ttk.Frame(cabecalho)
-frame_botoes.grid(row=2, column=0, sticky="ew")
+frame_botoes = ttk.Frame(subpagina_relatorio)
+frame_botoes.grid(row=0, column=0, sticky="ew")
+# -- BOTÃO EXPORTAR
+button_relatorio = ttk.Button(frame_botoes, text="Exportar", width=25)
+button_relatorio.grid(row=0, column=0, pady=(10, 5), padx=(10), sticky="e")
+# -- BOTÃO LANÇAR SOLICITAÇÃO
+button_lancar_solicitacao = ttk.Button(frame_botoes, text="Lançar Solicitação", width=25, command=lambda: abrir_janela_lancar_solicitacao())
+button_lancar_solicitacao.grid(row=0, column=1, pady=(10, 5), padx=(0, 10), sticky="e")
+# -- SEPARADOR
+separador = ttk.Separator(frame_botoes, orient='vertical')
+separador.grid(row=0, column=2, pady=(15, 10), padx=(0, 10), sticky="ns")
 # -- BOTÃO SEPARAR
 button_separar = ttk.Button(frame_botoes, text="Separar", width=20)
-button_separar.grid(row=0, column=0, pady=(0, 5), padx=(10, 10), sticky="e")
+button_separar.grid(row=0, column=3, pady=(10, 5), padx=(0, 10), sticky="e")
 # -- BOTÃO DESPACHAR
 button_despachar = ttk.Button(frame_botoes, text="Despachar", width=20)
-button_despachar.grid(row=0, column=1, pady=(0, 5), padx=(0, 10), sticky="e")
+button_despachar.grid(row=0, column=4, pady=(10, 5), padx=(0, 10), sticky="e")
 
 # FILTROS
-filtros_solicitacao = tk.LabelFrame(pagina_solicitacoes, text="Filtros")
-filtros_solicitacao.grid(row=3, column=0, columnspan=2, pady=(0, 10), padx=10, sticky="ew")
+filtros_solicitacao = tk.LabelFrame(subpagina_relatorio, text="Filtros")
+filtros_solicitacao.grid(row=1, column=0, columnspan=2, pady=(0, 10), padx=10, sticky="ew")
 linha1 = tk.Frame(filtros_solicitacao)
 linha1.pack(fill="x", side="top")
 linha2 = tk.Frame(filtros_solicitacao)
@@ -230,13 +249,11 @@ button_buscar = ttk.Button(linha2, text="Buscar", width=20)
 button_buscar.pack(fill="x", side="left", padx=(0, 10), pady=(5, 10))
 
 # TABELA SOLICITAÇÕES + TABELA PRODUTOS
-tabela_solicitacoes = ttk.Treeview(pagina_solicitacoes, columns=("ID", "Unidade", "Solic.", "Empregado", "Cargo", "Finalidade", "Data"), show="headings", height=10)
-tabela_solicitacoes.heading("ID", text="ID")
-tabela_solicitacoes.column("ID", width=60, anchor="center", stretch=False)
-tabela_solicitacoes.heading("Unidade", text="Unidade")
-tabela_solicitacoes.column("Unidade", width=60, anchor="center", stretch=False)
+tabela_solicitacoes = ttk.Treeview(subpagina_relatorio, columns=("Solic.", "Unidade", "Empregado", "Cargo", "Finalidade", "Data"), show="headings", height=10)
 tabela_solicitacoes.heading("Solic.", text="Solic.")
 tabela_solicitacoes.column("Solic.", width=60, anchor="center", stretch=False)
+tabela_solicitacoes.heading("Unidade", text="Unidade")
+tabela_solicitacoes.column("Unidade", width=60, anchor="center", stretch=False)
 tabela_solicitacoes.heading("Empregado", text="Empregado")
 tabela_solicitacoes.column("Empregado", width=50, anchor="center")
 tabela_solicitacoes.heading("Cargo", text="Cargo")
@@ -245,9 +262,9 @@ tabela_solicitacoes.heading("Finalidade", text="Finalidade")
 tabela_solicitacoes.column("Finalidade", width=20, anchor="center")
 tabela_solicitacoes.heading("Data", text="Data")
 tabela_solicitacoes.column("Data", width=70, anchor="center", stretch=False)
-tabela_solicitacoes.grid(row=4, column=0, columnspan=2, padx=10, pady=(0, 10), sticky="nsew")
+tabela_solicitacoes.grid(row=2, column=0, columnspan=2, padx=10, pady=(0, 10), sticky="nsew")
 
-tabela_produtos_solicitacoes = ttk.Treeview(pagina_solicitacoes, columns=("Categoria", "Produtos", "Qtd.", "Status"), show="headings", height=5)
+tabela_produtos_solicitacoes = ttk.Treeview(subpagina_relatorio, columns=("Categoria", "Produtos", "Qtd.", "Status"), show="headings", height=3)
 tabela_produtos_solicitacoes.heading("Categoria", text="Categoria")
 tabela_produtos_solicitacoes.column("Categoria", width=100, anchor="center", stretch=False)
 tabela_produtos_solicitacoes.heading("Produtos", text="Produtos")
@@ -256,7 +273,13 @@ tabela_produtos_solicitacoes.heading("Qtd.", text="Qtd.")
 tabela_produtos_solicitacoes.column("Qtd.", width=30, anchor="center", stretch=False)
 tabela_produtos_solicitacoes.heading("Status", text="Status")
 tabela_produtos_solicitacoes.column("Status", width=150, anchor="center", stretch=False)
-tabela_produtos_solicitacoes.grid(row=5, column=0, columnspan=2, padx=10, pady=(0, 10), sticky="nsew")
+tabela_produtos_solicitacoes.grid(row=3, column=0, columnspan=2, padx=10, pady=(0, 10), sticky="nsew")
+
+# -- 02.2 SUBPÁGINA TOTAL =====================================================
+subpagina_total = ttk.Frame(notebook_pagina_solicitacoes)
+subpagina_total.grid_columnconfigure(0, weight=1)
+subpagina_total.grid_rowconfigure(2, weight=1)
+notebook_pagina_solicitacoes.add(subpagina_total, text="Total") # ADICIONO A SUBPÁGINA TOTAL AO NOTEBOOK PÁGINA SOLICITAÇÕES
 
 # ==============================================================================
 # 03. PÁGINA DASHBOARDS DO NOTEBOOK
@@ -288,6 +311,10 @@ titulo.grid(row=0, column=1, sticky="w", pady=(10, 0), padx=(10, 0))
 subtitulo = ttk.Label(cabecalho, text=nome_da_empresa, font=("Aptos", 9), foreground=cor_chave)
 subtitulo.grid(row=1, column=1, sticky="w", pady=(0, 10), padx=(10, 0))
 
+# BOTÃO CADASTRAR PRODUTO
+button_produtos = ttk.Button(pagina_produtos, text="Cadastrar Produto", width=25, command=lambda:abrir_janela_cadastrar_produto())
+button_produtos.grid(row=1, column=0, sticky="w", padx=10)
+
 # ==============================================================================
 # 05. PÁGINA FORNECEDORES
 # ==============================================================================
@@ -302,6 +329,10 @@ titulo = ttk.Label(cabecalho, text="Fornecedores", font=("Aptos", 26, "bold"), f
 titulo.grid(row=0, column=1, sticky="w", pady=(10, 0), padx=(10, 0))
 subtitulo = ttk.Label(cabecalho, text=nome_da_empresa, font=("Aptos", 9), foreground=cor_chave)
 subtitulo.grid(row=1, column=1, sticky="w", pady=(0, 10), padx=(10, 0))
+
+# BOTÃO CADASTRAR FORNECEDOR
+button_cadastrar_fornecedor = ttk.Button(pagina_fornecedores, text="Cadastrar Fornecedor", width=25, command=lambda:abrir_janela_cadastrar_fornecedor())
+button_cadastrar_fornecedor.grid(row=1, column=0, sticky="w", padx=10)
 
 # ==============================================================================
 # 06. PÁGINA UNIDADES
@@ -318,45 +349,46 @@ titulo.grid(row=0, column=1, sticky="w", pady=(10, 0), padx=(10, 0))
 subtitulo = ttk.Label(cabecalho, text=nome_da_empresa, font=("Aptos", 9), foreground=cor_chave)
 subtitulo.grid(row=1, column=1, sticky="w", pady=(0, 10), padx=(10, 0))
 
+# BOTÃO CADASTRAR UNIDADE
+button_cadastrar_unidade = ttk.Button(pagina_unidades, text="Cadastrar Unidade", width=25, command=lambda:abrir_janela_cadastrar_unidade())
+button_cadastrar_unidade.grid(row=1, column=0, sticky="w", padx=10)
+
+# ==============================================================================
+# 06. PÁGINA CARGOS
+# ==============================================================================
+img_cargos = tk.PhotoImage(file=r"assets\icone_cargos.png")
+pagina_cargos = ttk.Frame(notebook)
+notebook.add(pagina_cargos, text="Cargos", image=img_cargos, compound="left")
+
+# CABEÇALHO
+cabecalho = tk.Frame(pagina_cargos)
+cabecalho.grid(row=0, column=0, sticky='ew')
+titulo = ttk.Label(cabecalho, text="Cargos", font=("Aptos", 26, "bold"), foreground=cor_chave)
+titulo.grid(row=0, column=1, sticky="w", pady=(10, 0), padx=(10, 0))
+subtitulo = ttk.Label(cabecalho, text=nome_da_empresa, font=("Aptos", 9), foreground=cor_chave)
+subtitulo.grid(row=1, column=1, sticky="w", pady=(0, 10), padx=(10, 0))
+
+# BOTÃO CADASTRAR CARGO
+button_cadastrar_cargo = ttk.Button(pagina_cargos, text="Cadastrar Cargo", width=25, command=lambda:abrir_janela_cadastrar_cargo())
+button_cadastrar_cargo.grid(row=1, column=0, sticky="w", padx=10)
+
 # ==============================================================================
 # 07. BARRA LATERAL
 # ==============================================================================
 barra_lateral = tk.Frame(painel_barra_lateral, width=260, background=cor_chave)
 barra_lateral.pack_propagate(False)
-# 07.1 LOGO
+
+# LOGO
 imagem = tk.PhotoImage(file=r"assets\logo.png")
 logo = tk.Label(barra_lateral, image=imagem, bd=0, background=cor_chave)
 logo.pack(pady=(20, 0))
-# 07.2 TEXTO DO LOGO
+# -- TEXTO DO LOGO
 logo_titulo = ttk.Label(barra_lateral, text="- CONTROLE -\nUNIFORMES E EPIS", font=("Aptos", 16, "bold"), foreground="#FFFFFF", background=cor_chave, justify="center")
 logo_titulo.pack(pady=(20, 0))
-
+# ---- SUBTÍTULO DO LOGO
 logo_subtitulo = ttk.Label(barra_lateral, text=nome_da_empresa, font=("Aptos", 9), foreground="#FFFFFF", background=cor_chave, justify="center")
 logo_subtitulo.pack()
-# 07.3 SEPARADOR
-separador = ttk.Separator(barra_lateral, orient='horizontal')
-separador.pack(fill="both", pady=(20, 20), padx=18)
-# 07.4 BOTÕES DE CADASTRO
-button_produtos = ttk.Button(barra_lateral, text="Cadastrar Produto", width=25, command=lambda:abrir_janela_cadastrar_produto())
-button_produtos.pack(pady=(0, 10))
-button_cadastrar_fornecedor = ttk.Button(barra_lateral, text="Cadastrar Fornecedor", width=25, command=lambda:abrir_janela_cadastrar_fornecedor())
-button_cadastrar_fornecedor.pack(pady=(0, 10))
-button_cadastrar_unidade = ttk.Button(barra_lateral, text="Cadastrar Unidade", width=25, command=lambda:abrir_janela_cadastrar_unidade())
-button_cadastrar_unidade.pack()
-# 07.5 SEPARADOR
-separador = ttk.Separator(barra_lateral, orient='horizontal')
-separador.pack(fill="both", pady=(20, 20), padx=18)
-# 07.6 BOTÕES DE LANÇAMENTOS
-button_lancar_transacao = ttk.Button(barra_lateral, text="Lançar Transação", width=25, command=lambda:abrir_janela_lancar_transacao())
-button_lancar_transacao.pack(pady=(0, 10))
-button_lancar_solicitacao = ttk.Button(barra_lateral, text="Lançar Solicitação", width=25, command=lambda: abrir_janela_lancar_solicitacao())
-button_lancar_solicitacao.pack()
-# 07.7 SEPARADOR
-separador = ttk.Separator(barra_lateral, orient='horizontal')
-separador.pack(fill="both", pady=(20, 20), padx=18)
-# 07.7 BOTÃO DE EXPORTAR RELATÓRIOS 
-button_relatorio = ttk.Button(barra_lateral, text="Exportar", width=25)
-button_relatorio.pack()
+
 # 07.8 CRÉDITOS
 credito = ttk.Label(barra_lateral, text="Feito por @MatheusParizz", background=cor_chave, foreground="white")
 credito.pack(side="bottom", pady=(0, 10))
@@ -650,8 +682,7 @@ def abrir_janela_lancar_transacao():
         print()
 
 solicitacoes = {
-    "000001": {
-        "solicitacao": "55001",
+    "55001": {
         "unidade": "CD",
         "empregado": "MATHEUS HENRIQUE",
         "cargo": "ASSIST. DE DEPTO. PESSOAL",
@@ -668,8 +699,7 @@ solicitacoes = {
              "qtd": 3,
              "status": "PENDENTE"},
         ]},
-    "000002": {
-        "solicitacao": "55001",
+    "55002": {
         "unidade": "CD",
         "empregado": "FULANO DE TAL",
         "cargo": "ASSIST. DE DEPTO. PESSOAL",
@@ -695,7 +725,6 @@ def carregar_solicitacoes():
             values=(
                 chave,
                 dados["unidade"],
-                dados["solicitacao"],
                 dados["empregado"],
                 dados["cargo"],
                 dados["finalidade"],
@@ -818,6 +847,10 @@ def abrir_janela_lancar_solicitacao():
     # LANÇAR SOLICITAÇÃO
     button_lancar_solicitacao2 = ttk.Button(janela_lancar_solicitacao, text="Confirmar")
     button_lancar_solicitacao2.grid(row=2, column=0, columnspan=4, sticky="ew", padx=10, pady=(0, 10))
+
+cargos = []
+def abrir_janela_cadastrar_cargo():
+    print("funcionando")
 
 def centralizar(container):
     container.update_idletasks()
